@@ -1,0 +1,17 @@
+trading:
+  symbol: "EURUSD"
+  risk_per_trade: 0.01
+  max_spread_pips: 3.0
+  confidence_threshold: 0.70
+  max_simultaneous_trades: 3
+  daily_drawdown_limit: 0.05
+  loss_streak_cooldown: 3
+
+timeframes:
+  execution: "M5"
+  confirmation: "M15"
+  regime: "H1"
+
+models:
+  lstm_sequence_length: 60
+  confidence_threshold: 0.70
