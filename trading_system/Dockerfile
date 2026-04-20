@@ -4,15 +4,21 @@ FROM gmag11/metatrader5_vnc:latest
 COPY . /app
 WORKDIR /app
 
-# Install Python deps (mt5linux client + your stack)
-RUN apt-get update && apt-get install -y supervisor && \
+# Fix WineHQ GPG key (common in recent builds) + install supervisor
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends supervisor && \
+    # Fix the exact GPG error you saw
+    mkdir -p /etc/apt/keyrings && \
+    wget -qO /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key && \
+    apt-get update && \
+    # Install Python dependencies (mt5linux + your stack)
     pip install --no-cache-dir -r requirements.txt && \
     rm -rf /var/lib/apt/lists/*
 
-# Supervisor to run MT5 server + your bot in parallel
+# Supervisor config to run MT5 server + your bot in parallel
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Persistent MT5 config + login (FBS demo)
+# Persistent volume for MT5 configuration and FBS login
 VOLUME ["/config"]
 
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
