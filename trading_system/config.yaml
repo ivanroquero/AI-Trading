@@ -15,3 +15,8 @@ timeframes:
 models:
   lstm_sequence_length: 60
   confidence_threshold: 0.70
+  
+mt5:
+  account: "105468555"
+  password: ":BnA?5R7"
+  server: "FBS-Demo"

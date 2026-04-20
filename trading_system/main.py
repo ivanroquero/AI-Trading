@@ -20,8 +20,10 @@ class TradingSystem:
         with open("config.yaml", "r") as f:
             self.config = yaml.safe_load(f)
         
-        # Initialize components
-        self.data = DataEngine(account=12345678, password="your_password", server="your_broker_server")
+        self.data = DataEngine(
+            account=int(os.getenv("MT5_ACCOUNT")),
+            password=os.getenv("MT5_PASSWORD"),
+        server=os.getenv("MT5_SERVER")
         self.features = FeatureEngineer()
         self.regime_detector = RegimeDetector()
         self.predictor = HybridPredictor()
