@@ -33,8 +33,8 @@ class TradingSystem:
         self.features = FeatureEngineer()
         self.regime_detector = RegimeDetector()
         self.predictor = HybridPredictor()
-        self.risk = RiskManager()
-        self.execution = ExecutionEngine()
+        self.risk = RiskManager(self.data.mt5)
+        self.execution = ExecutionEngine(self.data.mt5)
         
         self.symbol = self.config["trading"]["symbol"]
         self.current_regime = None
