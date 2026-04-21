@@ -10,6 +10,8 @@ class RiskManager:
         risk_amount = account_info.equity * self.max_risk
         pip_value = self.mt5.symbol_info(symbol).trade_tick_value
         sl_distance = abs(entry - sl) / self.mt5.symbol_info(symbol).point
+        if sl_distance == 0:
+            return 0.01
         lots = risk_amount / (sl_distance * pip_value * 10)
         return round(max(0.01, lots), 2)
     

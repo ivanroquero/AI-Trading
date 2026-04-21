@@ -52,6 +52,10 @@ class TradingSystem:
                 
                 # 2. Features
                 features_m5 = self.features.generate_features(df_m5)
+                if len(features_m5) < 100:
+                    logging.warning("Insufficient bars after feature engineering")
+                    time.sleep(60)
+                    continue
                 features_h1 = self.features.generate_features(df_h1)
                 
                 # 3. Regime detection (on H1)
