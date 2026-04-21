@@ -15,8 +15,12 @@ timeframes:
 models:
   lstm_sequence_length: 60
   confidence_threshold: 0.70
-  
+
 mt5:
   account: "105468555"
   password: ":BnA?5R7"
   server: "FBS-Demo"
+
+alerts:
+  token: "8757227907:AAHhIOTNLQA6XZVBv2s3qXvQhL9MGw91z0E"
+  chat_id: "8442066141"

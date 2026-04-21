@@ -2,27 +2,34 @@ import pandas as pd
 import numpy as np
 from feature_engineering import FeatureEngineer
 from ai_models.ensemble import HybridPredictor
-# ... (load historical parquet data)
+from utils.helpers import load_historical_data, calculate_performance_metrics
 
 class WalkForwardBacktester:
-    def run(self, historical_df: pd.DataFrame):
-        # Simple walk-forward logic (expand for full backtest)
+    def run(self, symbol: str = "EURUSD", timeframe: str = "M5"):
+        historical_df = load_historical_data(symbol, timeframe)
+        if historical_df.empty:
+            print("No historical data – train or collect first")
+            return
+        
         features = FeatureEngineer().generate_features(historical_df)
         predictor = HybridPredictor()
         
         signals = []
         for i in range(60, len(features)):
-            pred = predictor.predict(features.iloc[i-60:i])
+            window = features.iloc[i-60:i]
+            pred = predictor.predict(window)
             if pred["confidence"] > 0.70:
                 signals.append(1 if pred["up_prob"] > 0.5 else -1)
             else:
                 signals.append(0)
         
-        # Compute metrics
         returns = historical_df["close"].pct_change().iloc[60:].values
         strategy_returns = np.array(signals) * returns
-        win_rate = (np.array(signals) > 0).mean()
-        sharpe = strategy_returns.mean() / strategy_returns.std() * np.sqrt(252) if strategy_returns.std() != 0 else 0
-        max_dd = (strategy_returns.cumsum().cummax() - strategy_returns.cumsum()).max()
         
-        print(f"Win Rate: {win_rate:.1%} | Sharpe: {sharpe:.2f} | Max DD: {max_dd:.1%}")
+        metrics = calculate_performance_metrics(pd.Series(np.cumsum(strategy_returns)))
+        print(f"Walk-Forward Results → Win Rate: {metrics['win_rate']:.1%} | "
+              f"Sharpe: {metrics['sharpe']:.2f} | Max DD: {metrics['max_drawdown']:.1%} | "
+              f"Profit Factor: {metrics['profit_factor']:.2f}")
+
+if __name__ == "__main__":
+    WalkForwardBacktester().run()
