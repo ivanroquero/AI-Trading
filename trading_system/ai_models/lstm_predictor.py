@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd 
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 import joblib
@@ -7,7 +8,6 @@ class LSTMPredictor:
     def __init__(self, sequence_length=60):
         self.sequence_length = sequence_length
         self.model = self._build_model()
-        # In production: self.model = load_model("models/lstm_predictor.h5")
     
     def _build_model(self):
         model = Sequential([
