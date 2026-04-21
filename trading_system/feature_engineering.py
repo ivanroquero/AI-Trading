@@ -5,7 +5,7 @@ class FeatureEngineer:
     def generate_features(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
         
-        # Moving averages (exact same as pandas_ta)
+        # Moving averages (exact match to original pandas_ta behavior)
         for w in [8, 13, 21, 34, 55]:
             df[f"ema_{w}"] = df["close"].ewm(span=w, adjust=False).mean()
             df[f"sma_{w}"] = df["close"].rolling(window=w).mean()
@@ -23,8 +23,10 @@ class FeatureEngineer:
         # Momentum & statistics
         df["returns"] = df["close"].pct_change()
         df["zscore_20"] = (df["close"] - df["close"].rolling(20).mean()) / df["close"].rolling(20).std()
+        
+        # ADX (column name kept as "adx" for RegimeDetector compatibility)
         adx_df = self._adx(df["high"], df["low"], df["close"])
-        df = pd.concat([df, adx_df], axis=1)
+        df["adx"] = adx_df["ADX_14"]
         
         # Price action
         df["higher_high"] = (df["high"] > df["high"].shift(1)).astype(int)
@@ -60,7 +62,6 @@ class FeatureEngineer:
         tr1 = (high - close.shift()).abs()
         tr2 = (low - close.shift()).abs()
         tr = pd.concat([tr0, tr1, tr2], axis=1).max(axis=1)
-        # Wilder smoothing (matches pandas_ta exactly)
         return tr.ewm(alpha=1/length, adjust=False).mean()
 
     @staticmethod
@@ -74,20 +75,17 @@ class FeatureEngineer:
 
     @staticmethod
     def _adx(high: pd.Series, low: pd.Series, close: pd.Series, length: int = 14):
-        # True Range
         tr = pd.concat([
             high - low,
             (high - close.shift()).abs(),
             (low - close.shift()).abs()
         ], axis=1).max(axis=1)
         
-        # +DM / -DM
         up = high - high.shift()
         down = low.shift() - low
         plus_dm = pd.Series(np.where((up > down) & (up > 0), up, 0), index=high.index)
         minus_dm = pd.Series(np.where((down > up) & (down > 0), down, 0), index=high.index)
         
-        # Wilder smoothing
         tr14 = tr.ewm(alpha=1/length, adjust=False).mean()
         plus_di = 100 * plus_dm.ewm(alpha=1/length, adjust=False).mean() / tr14
         minus_di = 100 * minus_dm.ewm(alpha=1/length, adjust=False).mean() / tr14
