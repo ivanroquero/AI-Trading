@@ -23,7 +23,9 @@ class TradingSystem:
         self.data = DataEngine(
             account=int(os.getenv("MT5_ACCOUNT")),
             password=os.getenv("MT5_PASSWORD"),
-        server=os.getenv("MT5_SERVER")
+            server=os.getenv("MT5_SERVER")
+        )
+        
         self.features = FeatureEngineer()
         self.regime_detector = RegimeDetector()
         self.predictor = HybridPredictor()
