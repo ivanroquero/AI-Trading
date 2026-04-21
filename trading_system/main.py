@@ -2,6 +2,8 @@ import yaml
 import time
 import logging
 from datetime import datetime
+import os  # ← ADDED (was missing)
+
 from data_layer import DataEngine
 from feature_engineering import FeatureEngineer
 from ai_models.regime_detector import RegimeDetector
@@ -10,6 +12,7 @@ from risk_manager import RiskManager
 from execution_engine import ExecutionEngine
 from utils.logger import setup_logger
 from utils.helpers import create_directories
+
 create_directories()
 
 class TradingSystem:
@@ -20,10 +23,11 @@ class TradingSystem:
         with open("config.yaml", "r") as f:
             self.config = yaml.safe_load(f)
         
+        # FIXED: Use config.yaml (already present) instead of undefined env vars
         self.data = DataEngine(
-            account=int(os.getenv("MT5_ACCOUNT")),
-            password=os.getenv("MT5_PASSWORD"),
-            server=os.getenv("MT5_SERVER")
+            account=int(self.config["mt5"]["account"]),
+            password=self.config["mt5"]["password"],
+            server=self.config["mt5"]["server"]
         )
         
         self.features = FeatureEngineer()
