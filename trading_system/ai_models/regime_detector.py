@@ -1,5 +1,4 @@
 import pandas as pd
-import pandas_ta as ta
 
 class RegimeDetector:
     def detect(self, df: pd.DataFrame) -> str:
